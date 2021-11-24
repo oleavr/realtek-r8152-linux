@@ -8,7 +8,9 @@
 #include <linux/init.h>
 #include <linux/version.h>
 #include <linux/in.h>
+#if defined(__i386__) || defined(__x86_64__)
 #include <acpi/acpi.h>
+#endif
 
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,31)
 	#include <linux/mdio.h>
@@ -16,6 +18,16 @@
 	#include <uapi/linux/mdio.h>
 #endif /* LINUX_VERSION_CODE >= KERNEL_VERSION(3,7,0) */
 #endif /* LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,31) */
+
+static inline void sg_unmark_end(struct scatterlist *sg)
+{
+	sg->page_link &= ~0x02;
+}
+
+static inline void dev_consume_skb_any(struct sk_buff *skb)
+{
+	dev_kfree_skb_any(skb);
+}
 
 #if LINUX_VERSION_CODE < KERNEL_VERSION(5,9,0)
 	#define from_tasklet(var, callback_tasklet, tasklet_fieldname)	\
@@ -32,11 +44,7 @@
 	# define __GCC4_has_attribute___fallthrough__         0
 	#endif
 
-	#if __has_attribute(__fallthrough__)
-	# define fallthrough                    __attribute__((__fallthrough__))
-	#else
-	# define fallthrough                    do {} while (0)  /* fallthrough */
-	#endif
+	#define fallthrough                    do {} while (0)  /* fallthrough */
 
 	#define MDIO_EEE_2_5GT				0x0001	/* 2.5GT EEE cap */
 #if LINUX_VERSION_CODE < KERNEL_VERSION(5,1,0)

@@ -1444,6 +1444,7 @@ out1:
 	return ret;
 }
 
+#if defined(__i386__) || defined(__x86_64__)
 static int rtl_mapt_read(struct r8152 *tp, char *mac_obj_name,
 			 acpi_object_type mac_obj_type, int mac_strlen,
 			 struct sockaddr *sa)
@@ -1490,6 +1491,7 @@ amacout:
 	kfree(obj);
 	return ret;
 }
+#endif
 
 /* Devices containing proper chips can support a persistent
  * host system provided MAC address.
@@ -1499,6 +1501,7 @@ static int vendor_mac_passthru_addr_read(struct r8152 *tp, struct sockaddr *sa)
 {
 	int ret = -EOPNOTSUPP;
 
+#if defined(__i386__) || defined(__x86_64__)
 	if (tp->dell_macpassthru || tp->bl_macpassthru) {
 		ret = rtl_mapt_read(tp, "\\_SB.AMAC", ACPI_TYPE_BUFFER, 0x17,
 				    sa);
@@ -1508,6 +1511,7 @@ static int vendor_mac_passthru_addr_read(struct r8152 *tp, struct sockaddr *sa)
 
 	if (tp->lenovo_macpassthru || tp->bl_macpassthru)
 		ret = rtl_mapt_read(tp, "\\MACA", ACPI_TYPE_STRING, 0x16, sa);
+#endif
 
 out:
 	return ret;
